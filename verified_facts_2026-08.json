@@ -31,6 +31,27 @@
       "source_url": "https://www.bankofengland.co.uk/monetary-policy-summary-and-minutes/2026/july-2026"
     },
     {
+      "id": "eu_housing_shortfall",
+      "statement": "The European Commission estimates the EU needs to add roughly 650,000 dwellings per year on top of the 1.6 million currently built annually to close the housing supply-demand gap over the next decade, at an estimated cost of EUR 150 billion per year.",
+      "date": "2025-12-16",
+      "source_name": "European Commission — Affordable Housing Plan, Staff Working Document SWD 2025-1053-2",
+      "source_url": "https://housing.ec.europa.eu/document/download/2ad4c9f2-602b-43ba-9ed9-ef2ee059cf97_en?filename=0_1.pdf"
+    },
+    {
+      "id": "eu_housing_2035_gap",
+      "statement": "By 2035, more than 2 million new homes per year will be needed EU-wide to meet demand, implying a cumulative shortfall of 7.14 million dwellings beyond the 17.06 million units already planned.",
+      "date": "2025-12-16",
+      "source_name": "European Commission Joint Research Centre",
+      "source_url": "https://joint-research-centre.ec.europa.eu/jrc-news-and-updates/housing-eu-more-2-million-new-homes-year-needed-2035-meet-demand-2025-12-16_en"
+    },
+    {
+      "id": "eu_affordability_context",
+      "statement": "Average house prices across the EU have risen more than 60% and rents more than 20% over the past decade; an estimated 42 million Europeans cannot afford to adequately heat their homes.",
+      "date": "2025-12-16",
+      "source_name": "European Commission — Housing",
+      "source_url": "https://housing.ec.europa.eu/news/commission-takes-action-more-affordable-housing-across-europe-2025-12-16_en"
+    },
+    {
       "id": "ecb_cutting_cycle_context",
       "statement": "The ECB cut rates eight times from June 2024 to June 2025, then held rates unchanged from June 2025 until the June 2026 hike.",
       "date": "2026-07-30",

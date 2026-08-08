@@ -43,6 +43,9 @@ def render_report(title: str, subtitle: str, kicker: str,
 
         badge_class = "pass" if fc.get("coverage_score", 1.0) == 1.0 else "review"
         badge_text = fc.get("verdict", "not checked")
+        if fc.get("n_claims_checked", 0) == 0 and fc.get("placeholders_used", 0) > 0:
+            badge_class = "gated"
+            badge_text = "NO PUBLIC SOURCE — section gated, nothing estimated"
 
         section_html_parts.append(
             f'<h2>{html.escape(sec["heading"])}</h2>\n'
