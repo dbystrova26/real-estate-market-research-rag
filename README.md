@@ -1,105 +1,119 @@
-"""
-Takes generated section text + its fact-check result and renders the styled HTML report.
-Deliberately does not use Catella's logo or exact typeface — see docs/design_note.md.
-"""
+# Real Estate Market Research RAG
 
-import html
-import re
-from datetime import date
-from pathlib import Path
+**A retrieval-augmented research assistant that would rather show you a gap than fill it with a guess.**
 
-TEMPLATE_PATH = Path(__file__).resolve().parent.parent / "templates" / "report_template.html"
+Most LLM-drafted research reads fluently and cites nothing. This project takes the opposite bet: every number Claude writes has to trace back to a real, dated, cited source — or the pipeline writes a visible `[DATA SOURCE NOT CONNECTED]` flag instead of a plausible-sounding figure. An independent fact-checker then re-verifies the draft against the retrieved sources before anything ships.
 
+Built as a working prototype for real estate market research — the kind of "keep the house view current between publication cycles" work a research analyst does constantly.
 
-def _format_body(text: str) -> str:
-    """Wrap [DATA SOURCE NOT CONNECTED: ...] placeholders in a styled div (as their own
-    block, not nested in <p>), regular paragraphs in <p>."""
-    escaped = html.escape(text)
-    paragraphs = [p.strip() for p in escaped.split("\n\n") if p.strip()]
-    out = []
-    for p in paragraphs:
-        placeholder_match = re.fullmatch(r"\[DATA SOURCE NOT CONNECTED:(.*?)\]", p, re.DOTALL)
-        if placeholder_match:
-            out.append(f'<div class="placeholder">⚠ Data source not connected:{placeholder_match.group(1)}</div>')
-        else:
-            out.append(f"<p>{p}</p>")
-    return "\n".join(out)
+---
 
+## Why this exists
 
-def render_report(title: str, subtitle: str, kicker: str,
-                   sections: list[dict], disclaimer: str,
-                   out_path: str) -> str:
-    """
-    sections: list of {"heading": str, "body": str, "fact_check": dict, "chunks": list[dict]}
-    """
-    all_sources = {}
-    section_html_parts = []
-    total_claims, total_grounded = 0, 0
+Institutional research has zero tolerance for a confidently-wrong number. Ask a general LLM "what's changed in European rates since March" and it will answer smoothly from training data of uncertain recency — sounding right is not the same as being right. This project constrains generation to *only* what's retrievable and citable, and checks that mechanically rather than trusting the model's word for it.
 
-    for sec in sections:
-        fc = sec.get("fact_check", {})
-        total_claims += fc.get("n_claims_checked", 0)
-        total_grounded += fc.get("n_grounded", 0)
+**Proof it works, not just a description of it:** [`rates_liquidity_update_2026-08.html`](rates_liquidity_update_2026-08.html) is a real, committed output — 100% of its numeric claims trace to a cited public source (ECB, US Federal Reserve, Bank of England, UK Parliament). It caught something genuinely material: the March 2026 report this project uses as a reference case assumed continuing rate cuts — but the **ECB actually reversed into a hiking cycle in June 2026**. The pipeline surfaced that contradiction instead of glossing over it, and flagged the two places where a full answer would need paid data feeds (Green Street, MSCI RCA, PMA) it doesn't have access to — rather than estimating them.
 
-        badge_class = "pass" if fc.get("coverage_score", 1.0) == 1.0 else "review"
-        badge_text = fc.get("verdict", "not checked")
+---
 
-        section_html_parts.append(
-            f'<h2>{html.escape(sec["heading"])}</h2>\n'
-            f'<span class="grounding-badge {badge_class}">{html.escape(badge_text)}</span>\n'
-            f'{_format_body(sec["body"])}'
-        )
+## How it works
 
-        for chunk in sec.get("chunks", []):
-            all_sources[chunk["source_name"]] = chunk.get("source_url", "")
+```
+sources (PDF / web / API)
+        │
+        ▼
+   ingest.py          — parses PDFs, fetches web pages via Jina Reader (free, no API key),
+        │                pulls Eurostat's public API. Every chunk keeps its source + date.
+        ▼
+  retrieve.py          — local, offline embeddings (sentence-transformers) + cosine
+        │                similarity search. Zero marginal cost to re-run.
+        ▼
+generate_report.py     — Claude drafts the section, constrained by a system prompt that
+        │                requires an inline citation for every claim, and a visible
+        │                placeholder — never a guess — for anything not retrievable.
+        ▼
+ fact_check.py         — an independent second pass extracts every number in the draft
+        │                and verifies it actually appears in a retrieved source chunk.
+        ▼
+render_report.py       — styled HTML output with a visible grounding score, so a reader
+                          can see coverage at a glance, not just trust the byline.
+```
 
-    overall_coverage = round(total_grounded / total_claims, 3) if total_claims else 1.0
-    grounding_summary = (
-        f'<div class="pullquote">Grounding check: {total_grounded}/{total_claims} numeric '
-        f'claims across this report traced to a cited source ({overall_coverage:.0%} coverage). '
-        f'See docs/methodology.md for how this check works and its limitations.</div>'
-    ) if total_claims else ""
+Full detail on the grounding rules and the fact-checker's known limitations (it's a deliberately blunt numeric-substring check, not a full NLI classifier — documented honestly, not oversold) is in [`methodology.md`](methodology.md).
 
-    source_list_html = "\n".join(
-        f'<li>{html.escape(name)}'
-        + (f' — <a href="{html.escape(url)}">{html.escape(url)}</a>' if url else '')
-        + '</li>'
-        for name, url in sorted(all_sources.items())
-    )
+---
 
-    template = TEMPLATE_PATH.read_text()
-    rendered = (
-        template
-        .replace("{{title}}", html.escape(title))
-        .replace("{{subtitle}}", html.escape(subtitle))
-        .replace("{{kicker}}", html.escape(kicker))
-        .replace("{{generated_meta}}", f"Generated {date.today().isoformat()} · Claude-drafted, RAG-grounded")
-        .replace("{{grounding_summary}}", grounding_summary)
-        .replace("{{sections}}", "\n".join(section_html_parts))
-        .replace("{{source_list}}", source_list_html)
-        .replace("{{disclaimer}}", html.escape(disclaimer))
-    )
+## Quick start
 
-    Path(out_path).write_text(rendered)
-    return out_path
+Requires Python 3.10+.
 
+```bash
+git clone https://github.com/dbystrova26/real-estate-market-research-rag.git
+cd real-estate-market-research-rag
+pip install -r requirements.txt
+cp env.example .env        # add your ANTHROPIC_API_KEY
 
-if __name__ == "__main__":
-    demo = render_report(
-        title="Rates & Liquidity Update",
-        subtitle="A grounded update to the March 2026 House View",
-        kicker="Independent research prototype — August 2026",
-        sections=[{
-            "heading": "What's changed since March",
-            "body": "The ECB raised its deposit facility rate to 2.25% on 17 June 2026 "
-                    "(Source: ECB, 2026-06-11).",
-            "fact_check": {"n_claims_checked": 1, "n_grounded": 1, "coverage_score": 1.0,
-                            "verdict": "PASS — all numeric claims traced to a source"},
-            "chunks": [{"source_name": "ECB — Monetary policy decision",
-                        "source_url": "https://www.ecb.europa.eu/press/pr/date/2026/html/ecb.mp260611~4d41bd5e83.en.html"}],
-        }],
-        disclaimer="Independent portfolio prototype. Not an official Catella publication "
-                   "and not affiliated with or endorsed by Catella AB.",
-        out_path="/tmp/demo_report.html",
-    )
-    print(f"Demo report written to {demo}")
+# See the already-built, already-grounded sample report:
+open rates_liquidity_update_2026-08.html
+
+# Rebuild it yourself — deterministic, no API call needed:
+python build_sample_report.py
+
+# Run the live Claude-drafting path on a new retrieval query:
+python generate_report.py
+
+# Run the fact-checker standalone against any draft text:
+python fact_check.py
+```
+
+---
+
+## Sources it uses
+
+This project's reference case is a real, public real estate house view — a good stand-in for the kind of report a research team needs to keep current. Of that report's 8 underlying data sources, this pipeline can only ground claims in the ones that are actually public:
+
+| Source | Access | Status here |
+|---|---|---|
+| ECB / Federal Reserve / Bank of England policy decisions | **Public** | Live — ingested via `ingest.py` |
+| Eurostat migration & population statistics | **Public API** | Live — ingested via `ingest.py` |
+| EU Commission policy documents (e.g. Affordable Housing Plan) | **Public** | Ingestible as PDF/web via `ingest.py` |
+| Green Street Advisors (European Property Price Index) | Paid subscription | Stubbed — flagged as `[DATA SOURCE NOT CONNECTED]`, never estimated |
+| MSCI RCA (transaction volumes, liquidity) | Paid subscription | Stubbed |
+| PMA (prime yields, prime rents) | Paid subscription | Stubbed |
+| Oxford Economics (GDP/rental forecasts) | Paid subscription | Stubbed |
+
+See [`source_registry.md`](source_registry.md) for the full breakdown, and [`use_case_definition.md`](use_case_definition.md) for who this is built for and what "done" looks like.
+
+**Web ingestion** uses [Jina Reader](https://github.com/jina-ai/reader) — free, no API key — the same pattern used in [Agent-Reach](https://github.com/dbystrova26/Agent-Reach), which is where this project's web-reading approach comes from.
+
+---
+
+## Grounding, quantified
+
+| Metric | Value |
+|---|---|
+| Numeric claims in the committed sample report | 17 |
+| Claims traced to a cited public source | **17 (100%)** |
+| Data gaps flagged rather than estimated | 2 |
+| Distinct sources cited | 5 (ECB ×2, Federal Reserve, Bank of England, UK Parliament) |
+
+---
+
+## What's next
+
+- **Multi-model comparison** — the same retrieval context run through ChatGPT, Gemini, DeepSeek, and Kimi, scored on *grounding coverage* rather than fluency. Claude is the generation model for phase 1; the multi-provider harness for phase 2 reuses the client pattern from a companion benchmark project.
+- **Proprietary connectors** — the Green Street / MSCI RCA / PMA / Oxford Economics stubs get real implementations the moment there's institutional access to plug in.
+- **Broader source ingestion** — more public feeds (national statistics offices, central bank research papers, regulatory filings) as the retrieval layer expands.
+
+---
+
+## A note on the reference case
+
+This project uses a real, publicly available real estate house view as its test case because building against an actual professional deliverable — not a toy example — is what makes the grounding claims meaningful. No text, data, or branding from that report is reproduced here; see [`design_note.md`](design_note.md) for the reasoning behind keeping this project's visual style and content independent of it. This is a personal prototype, not an official publication of, or affiliated with, the organization whose report it references.
+
+---
+
+## Author
+
+**Daria Bystrova** — AI Consulting Portfolio Project, 2026
+[github.com/dbystrova26/real-estate-market-research-rag](https://github.com/dbystrova26/real-estate-market-research-rag)

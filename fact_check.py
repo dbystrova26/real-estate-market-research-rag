@@ -1,55 +1,77 @@
-# Use Case Definition
+"""
+Independent grounding check: does every factual claim in a generated draft actually
+appear in the chunks that were retrieved for it?
 
-## Context
+Deliberately blunt (regex-based numeric/date extraction + substring/fuzzy match), not a
+full NLI grounding classifier — documented as a limitation in docs/methodology.md.
+Treat the output as a useful flag for a human reviewer, not a certification.
+"""
 
-Catella publishes a House View twice a year — a synthesized market outlook drawing on
-proprietary data feeds (Green Street, MSCI RCA, PMA, Oxford Economics) and the research
-team's own judgment. Between publications, the world doesn't wait: rates move, deals
-close, policy shifts. This project is a working prototype of a tool a research analyst
-could use to keep a house view "live" between formal publication cycles — not to replace
-analyst judgment, but to do the grinding first pass: watch the sources, flag what's
-changed, draft the update with citations attached, and hand the analyst a starting point
-they can trust because every claim traces back to a real source.
+import re
+from difflib import SequenceMatcher
 
-## Why RAG, specifically
 
-A general-purpose LLM asked "what's happened in European real estate rates since March"
-will answer from training data of uncertain recency and mix in things that sound plausible
-but aren't sourced. For institutional research, that's not good enough — a wrong number in
-a house view is a credibility problem, not just an inconvenience. Retrieval-augmented
-generation constrains the model to only assert what's actually in a retrieved, dated,
-sourced document, and this project's fact-checker (`rag/fact_check.py`) enforces that
-constraint mechanically rather than trusting the model's honesty alone.
+NUMBER_PATTERN = re.compile(r"-?\d+\.?\d*%?")
 
-## Target user
 
-A real estate research analyst (the role I'm applying for) who wants to:
+def extract_claims(draft_text: str) -> list[str]:
+    """Pull out numeric tokens (rates, percentages, dates, counts) as the checkable
+    claims — the cheapest reliable proxy for 'a fact that could be wrong'."""
+    # skip anything inside a NOT CONNECTED placeholder — those are already flagged
+    cleaned = re.sub(r"\[DATA SOURCE NOT CONNECTED:.*?\]", "", draft_text)
+    # strip our own inline citation parentheticals, e.g. "(Source: ECB, 2026-06-11)" —
+    # these are provenance metadata we inserted, not separate factual claims, and their
+    # hyphenated dates would otherwise be misparsed into spurious fragments like "-06"
+    cleaned = re.sub(r"\(Source:[^)]*\)", "", cleaned)
+    return sorted(set(NUMBER_PATTERN.findall(cleaned)))
 
-1. Feed in a prior house view (or any market report) as a baseline
-2. Point the pipeline at the same primary sources the original report used
-3. Get back a **draft update** — what's changed, what's confirmed, what needs a fresh
-   analyst call — with every factual claim citable to a specific source and date
-4. Extend the source list beyond what the original report used, when something material
-   happens that the original sources wouldn't have caught yet (e.g. a geopolitical shock)
 
-## What "done" looks like for this prototype
+def is_grounded(claim: str, chunks: list[dict], min_ratio: float = 0.99) -> tuple[bool, str | None]:
+    """A numeric claim is 'grounded' if the exact token appears in at least one chunk's
+    text. Returns (is_grounded, matching_source_name_or_None)."""
+    for chunk in chunks:
+        if claim in chunk["text"]:
+            return True, chunk["source_name"]
+    return False, None
 
-- Ingests the March 2026 Catella House View as a baseline document (via `rag/ingest.py`)
-- Ingests the report's own footnoted public sources (ECB/Fed/BOE, Eurostat, EU Affordable
-  Housing Plan) plus any new public sources relevant to changes since March
-- Retrieves and cites specific passages rather than summarizing from memory
-- Flags every section where a proprietary data feed (Green Street, MSCI RCA, PMA, Oxford
-  Economics) would be needed to fully update the analysis, rather than guessing at what
-  those feeds would show
-- Produces one real, fully-grounded worked example: a rates & liquidity update, since
-  that's the one area where all the needed sources are public — see
-  `reports/sample/rates_liquidity_update_2026-08.md`
 
-## Phase 2 (not built yet, scaffolded)
+def check_draft(draft_text: str, retrieved_chunks: list[dict]) -> dict:
+    claims = extract_claims(draft_text)
+    results = []
+    for claim in claims:
+        grounded, source = is_grounded(claim, retrieved_chunks)
+        results.append({"claim": claim, "grounded": grounded, "source": source})
 
-Once the RAG + grounding pipeline is proven on Claude, the same source-retrieval layer
-feeds identical prompts to ChatGPT, Gemini, DeepSeek, and Kimi to compare which model
-stays best-grounded (lowest ungrounded-claim rate) under the same retrieval context —
-reusing the multi-provider client pattern from the companion
-[llm-real-estate-benchmark](https://github.com/dbystrova26/llm-real-estate-benchmark)
-project. Grounding quality, not raw fluency, is the metric that matters for this use case.
+    n_grounded = sum(1 for r in results if r["grounded"])
+    coverage = round(n_grounded / len(results), 3) if results else 1.0
+    unverified = [r["claim"] for r in results if not r["grounded"]]
+    placeholders_used = len(re.findall(r"\[DATA SOURCE NOT CONNECTED:", draft_text))
+
+    return {
+        "n_claims_checked": len(results),
+        "n_grounded": n_grounded,
+        "coverage_score": coverage,
+        "unverified_claims": unverified,
+        "placeholders_used": placeholders_used,
+        "detail": results,
+        "verdict": (
+            "PASS — all numeric claims traced to a source" if coverage == 1.0
+            else f"REVIEW NEEDED — {len(unverified)} claim(s) not found in retrieved sources"
+        ),
+    }
+
+
+if __name__ == "__main__":
+    demo_draft = (
+        "The ECB raised its deposit facility rate to 2.25% on 17 June 2026, the first "
+        "hike in three years (Source: ECB, 2026-06-11). Rents rose 6% in Berlin last year."
+    )
+    demo_chunks = [{
+        "source_name": "ECB",
+        "text": "raised the deposit facility rate by 25bps to 2.25% (from 2.00%) effective 17 June 2026",
+    }]
+    result = check_draft(demo_draft, demo_chunks)
+    print(f"Verdict: {result['verdict']}")
+    print(f"Coverage: {result['coverage_score']}")
+    if result["unverified_claims"]:
+        print(f"Unverified: {result['unverified_claims']}")
