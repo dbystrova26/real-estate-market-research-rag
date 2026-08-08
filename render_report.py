@@ -67,7 +67,7 @@ def render_report(title: str, subtitle: str, kicker: str,
         for name, url in sorted(all_sources.items())
     )
 
-    template = TEMPLATE_PATH.read_text()
+    template = TEMPLATE_PATH.read_text(encoding="utf-8")
     rendered = (
         template
         .replace("{{title}}", html.escape(title))
@@ -80,7 +80,7 @@ def render_report(title: str, subtitle: str, kicker: str,
         .replace("{{disclaimer}}", html.escape(disclaimer))
     )
 
-    Path(out_path).write_text(rendered)
+    Path(out_path).write_text(rendered, encoding="utf-8")
     return out_path
 
 

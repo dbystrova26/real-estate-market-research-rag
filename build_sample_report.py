@@ -104,7 +104,7 @@ def main():
         md_lines.append(f"## {sec['heading']}\n")
         md_lines.append(sec["body"] + "\n")
         md_lines.append(f"*Grounding: {sec['fact_check']['verdict']}*\n")
-    (out_dir / "rates_liquidity_update_2026-08.md").write_text("\n".join(md_lines))
+    (out_dir / "rates_liquidity_update_2026-08.md").write_text("\n".join(md_lines), encoding="utf-8")
 
     print(f"\nWritten: {html_path}")
     print(f"Written: {out_dir / 'rates_liquidity_update_2026-08.md'}")
