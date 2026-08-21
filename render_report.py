@@ -64,17 +64,17 @@ def render_report(title: str, subtitle: str, kicker: str,
 
 if __name__ == "__main__":
     demo = render_report(
-        title="Rates & Liquidity Update",
-        subtitle="A grounded update to the March 2026 House View",
+        title="Data Center Update",
+        subtitle="A grounded update on European data center vacancy",
         kicker="Independent research prototype",
         sections=[{
             "heading": "What's changed",
-            "body": "The ECB raised its deposit facility rate to 2.25% on 17 June 2026 "
-                    "(Source: ECB, 2026-06-11).",
+            "body": "European data center vacancy fell below 10% in late 2024 "
+                    "(Source: CBRE, 2026-01-01).",
             "fact_check": {"n_claims_checked": 1, "n_grounded": 1, "coverage_score": 1.0,
                             "verdict": "PASS"},
-            "chunks": [{"source_name": "ECB",
-                        "source_url": "https://www.ecb.europa.eu"}],
+            "chunks": [{"source_name": "CBRE",
+                        "source_url": "https://www.cbre.com"}],
         }],
         disclaimer="Independent portfolio prototype.",
         out_path="/tmp/demo_report.html",

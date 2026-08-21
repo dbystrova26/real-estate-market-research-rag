@@ -1,11 +1,6 @@
 {
-  "_note": "Short, paraphrased summaries of a house view's core themes — used as the baseline the trend agent checks new search results against.",
+  "_note": "Short, paraphrased summaries of a house view's core themes \u2014 used as the baseline the trend agent checks new search results against.",
   "themes": [
-    {
-      "id": "rates_easing_thesis",
-      "summary": "Central banks were expected to keep cutting rates through 2026, making debt increasingly accretive to property returns.",
-      "search_query": "ECB Federal Reserve Bank of England interest rate decision 2026"
-    },
     {
       "id": "price_discovery_complete",
       "summary": "European property price discovery was seen as largely complete after a pan-regional decline since 2021, with a new pricing cycle beginning.",

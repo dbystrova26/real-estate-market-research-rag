@@ -10,7 +10,6 @@ registry maps common source types to whether they're publicly accessible today
 | MSCI RCA (Real Capital Analytics) | Investment volumes, liquidity | No — subscription | Not connected |
 | PMA (Property Market Analysis) | Prime yields, prime rents | No — subscription | Not connected |
 | Oxford Economics | GDP growth, rental forecasts | No — subscription | Not connected |
-| ECB / Federal Reserve / Bank of England | Central bank policy rates | **Yes — public** | Live, via `ingest.py` |
 | Eurostat | Migration, demographic data | **Yes — public API** | Live, via `ingest.py` |
 | European Commission documents | Affordable housing shortfall figures | **Yes — public document** | Live, ingestible |
 | CBRE / Colliers / Savills press releases | Investment volumes, sector outlooks | **Yes — often public** | Live, several used |

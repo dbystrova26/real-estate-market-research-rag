@@ -3,7 +3,8 @@ The current, recommended entry point for generating the report.
 
   - New-trend sections stand alone as findings, not framed as "not in the March 2026
     house view."
-  - Rates section presented as a current outlook, not "what's changed since March."
+  - Rates & Liquidity section removed at the person's request — this build covers
+    new trends and capital flows/affordable housing only.
   - "Sources Cited" only lists sources actually cited inline in that section's text.
   - Sections with no real content (only a placeholder) are dropped entirely.
   - No visible grounding jargon in the output — fact_check.py still runs internally.
@@ -127,42 +128,6 @@ S2_BODY = (
     "markets — rather than a generic 'defense theme' allocation."
 )
 
-S3_HEADING = "Rates & Liquidity Outlook"
-S3_CHART = "policy_rates"
-S3_BODY = (
-    "The financing backdrop for European real estate has shifted from easing to a "
-    "paused-to-tightening stance. On 17 June 2026, the ECB raised its deposit facility "
-    "rate by 25 basis points to 2.25% — its first hike in three years, following eight "
-    "consecutive cuts between June 2024 and June 2025 (Source: UK House of Commons "
-    "Library, 2026-07-30) — in response to an energy price shock tied to the Middle "
-    "East conflict that pushed the ECB's 2026 inflation projection to 2.6% (Source: "
-    "European Central Bank — Monetary policy decision, 2026-06-11). The ECB held "
-    "steady at its next meeting, with the deposit facility, main refinancing, and "
-    "marginal lending rates unchanged at 2.25%, 2.40%, and 2.65% (Source: European "
-    "Central Bank — Economic Bulletin Issue 5, 2026, 2026-07-23). The Federal Reserve "
-    "and Bank of England have followed the same pattern of pausing rather than "
-    "continuing to cut: the Fed held at 3.50%-3.75% on 29 July 2026 with three dissents "
-    "favoring a hike, under new Chair Kevin Warsh (Source: Federal Reserve Board — "
-    "Implementation Note, 2026-07-29), and the Bank of England's MPC voted 6-3 to hold "
-    "at 3.75%, with the three dissenters wanting a hike to 4% (Source: Bank of England "
-    "— Monetary Policy Summary and Minutes, July 2026, 2026-07-29).\n\n"
-    "The practical implication is that underwriting built on a falling-rate base case "
-    "needs revisiting. Debt that looked increasingly accretive to returns under a "
-    "continued-cutting assumption is now, at minimum, a flatter picture, and for any "
-    "deal underwritten with an exit-cap-rate-compression assumption tied to further "
-    "easing, that assumption should be re-tested against a paused-to-tightening base "
-    "case. The proximate cause — an energy-driven inflation shock rather than a "
-    "demand-side overheating — also matters: this is not necessarily the start of a "
-    "new multi-hike cycle, but it is a clear signal that the rate environment is no "
-    "longer a one-directional tailwind.\n\n"
-    "For positioning, this argues for weighting income durability over cap-rate-"
-    "compression-dependent underwriting until the direction of the next one or two "
-    "central bank decisions is clearer. Assets with strong, contracted income and "
-    "limited near-term refinancing exposure are better placed to absorb a period of "
-    "rate uncertainty than assets whose return case depends on financing costs "
-    "continuing to fall."
-)
-
 S4_HEADING = "Transaction Volumes & Capital Flows"
 S4_CHART = "h1_investment_by_sector"
 S4_BODY = (
@@ -211,10 +176,10 @@ S5_BODY = (
     "2025-12-16).\n\n"
     "The scale and pan-European consistency of this shortfall is what makes it a "
     "genuinely structural thesis rather than a cyclical one — it is not sensitive to "
-    "the rate environment or transaction-volume cycle discussed above the way most "
+    "the transaction-volume cycle discussed above the way most "
     "other sectors are. Rental housing, and affordable-rent product specifically, sits "
     "on the right side of a supply-demand imbalance that a single policy plan will not "
-    "close quickly: the Commission's own 650,000-unit annual gap is roughly 40% on top "
+    "close quickly: the Commission's own 650,000-unit annual gap sits on top "
     "of current build rates, which is not a shortfall construction activity closes "
     "within a normal cycle.\n\n"
     "The remaining work for an analyst here is market selection, not validating "
@@ -258,7 +223,6 @@ def main():
         build_section(S0_HEADING, S0_BODY, all_chunks, S0_CHART),
         build_section(S1_HEADING, S1_BODY, all_chunks, S1_CHART),
         build_section(S2_HEADING, S2_BODY, all_chunks, S2_CHART),
-        build_section(S3_HEADING, S3_BODY, all_chunks, S3_CHART),
         build_section(S4_HEADING, S4_BODY, all_chunks, S4_CHART),
         build_section(S5_HEADING, S5_BODY, all_chunks, S5_CHART),
     ]

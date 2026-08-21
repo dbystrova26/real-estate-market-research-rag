@@ -157,10 +157,11 @@ if __name__ == "__main__":
         title="Demo Report", subtitle="A quick reportlab rendering check",
         kicker="Test", sections=[{
             "heading": "Sample Section",
-            "body": "This is a grounded claim at 2.25% (Source: ECB, 2026-06-11).\n\n"
+            "body": "This is a grounded claim: vacancy fell below 10% in late 2024 "
+                    "(Source: CBRE, 2026-01-01).\n\n"
                     "[DATA SOURCE NOT CONNECTED: this part needs a paid feed.]",
             "fact_check": {"n_claims_checked": 1, "n_grounded": 1, "coverage_score": 1.0},
-            "chunks": [{"source_name": "ECB", "source_url": "https://www.ecb.europa.eu"}],
+            "chunks": [{"source_name": "CBRE", "source_url": "https://www.cbre.com"}],
         }],
         disclaimer="Test disclaimer.",
         out_path="/tmp/demo.pdf",

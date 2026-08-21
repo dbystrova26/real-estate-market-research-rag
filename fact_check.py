@@ -63,12 +63,12 @@ def check_draft(draft_text: str, retrieved_chunks: list[dict]) -> dict:
 
 if __name__ == "__main__":
     demo_draft = (
-        "The ECB raised its deposit facility rate to 2.25% on 17 June 2026, the first "
-        "hike in three years (Source: ECB, 2026-06-11). Rents rose 6% in Berlin last year."
+        "European data center vacancy fell below 10% in late 2024 and is forecast to "
+        "reach 6.5% by end-2026 (Source: CBRE, 2026-01-01). Rents rose 6% in Berlin last year."
     )
     demo_chunks = [{
-        "source_name": "ECB",
-        "text": "raised the deposit facility rate by 25bps to 2.25% (from 2.00%) effective 17 June 2026",
+        "source_name": "CBRE",
+        "text": "vacancy fell below 10% for the first time in late 2024, forecast to reach 6.5% by the close of 2026",
     }]
     result = check_draft(demo_draft, demo_chunks)
     print(f"Verdict: {result['verdict']}")

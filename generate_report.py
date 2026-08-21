@@ -69,12 +69,12 @@ if __name__ == "__main__":
     store = LocalVectorStore()
     store.add_chunks(load_verified_facts("verified_facts_2026-08.json"))
     chunks = store.retrieve(
-        "central bank policy rate changes since the March 2026 house view", k=5
+        "European data center real estate investment trends", k=5
     )
 
     brief = (
-        "Draft a short 'Rates & Liquidity Update' section (150-250 words) covering what "
-        "has changed in ECB, Federal Reserve, and Bank of England policy rates since "
-        "March 2026, and what that implies for the report's original financing-cost thesis."
+        "Draft a short 'Emerging Asset Class Update' section (150-250 words) covering "
+        "the current state of European data center real estate investment and what "
+        "that implies for institutional positioning."
     )
     print(generate_section(brief, chunks))

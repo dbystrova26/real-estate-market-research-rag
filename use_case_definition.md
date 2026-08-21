@@ -12,7 +12,7 @@ with citations attached.
 
 ## Why RAG, specifically
 
-A general-purpose LLM asked "what's happened in European real estate rates since
+A general-purpose LLM asked "what's happened in European real estate investment since
 March" will answer from training data of uncertain recency and mix in things that
 sound plausible but aren't sourced. Retrieval-augmented generation constrains the
 model to only assert what's actually in a retrieved, dated, sourced document, and this
@@ -32,7 +32,7 @@ A real estate research analyst who wants to:
 ## What "done" looks like for this prototype
 
 - Ingests a baseline house view as reference (via `ingest.py`)
-- Ingests public sources (ECB/Fed/BOE, Eurostat, EU Commission documents)
+- Ingests public sources (Eurostat, EU Commission documents, industry press releases)
 - Retrieves and cites specific passages rather than summarizing from memory
 - Flags where a proprietary data feed would be needed, rather than guessing
 - Produces real, fully-grounded worked examples — see `real_estate_market_research_update_2026-08.{html,pdf,md}`

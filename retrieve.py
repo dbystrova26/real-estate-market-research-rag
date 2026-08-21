@@ -61,7 +61,7 @@ if __name__ == "__main__":
     store = LocalVectorStore()
     store.add_chunks(load_verified_facts("verified_facts_2026-08.json"))
 
-    results = store.retrieve("has the ECB changed interest rates recently", k=3)
+    results = store.retrieve("has European data center vacancy changed recently", k=3)
     print("Top matches:\n")
     for r in results:
         print(f"  [{r['_similarity']}] {r['source_name']}: {r['text'][:100]}...")

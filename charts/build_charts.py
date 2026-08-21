@@ -46,24 +46,6 @@ def _finalize(fig, ax, title, source_note):
     fig.text(0.02, 0.02, wrapped, fontsize=7, color=MUTED, ha="left", va="bottom")
 
 
-def chart_policy_rates() -> str:
-    fig, ax = plt.subplots(figsize=(5.5, 3.2))
-    banks = ["ECB\n(deposit facility)", "Federal Reserve\n(range midpoint)", "Bank of England\n(Bank Rate)"]
-    rates = [2.25, 3.625, 3.75]
-    bars = ax.bar(banks, rates, color=[ACCENT, BARCOLOR, BARCOLOR], width=0.5)
-    for bar, rate in zip(bars, rates):
-        ax.text(bar.get_x() + bar.get_width() / 2, rate + 0.08, f"{rate}%",
-                 ha="center", fontsize=10, fontweight="bold")
-    ax.set_ylim(0, 4.5)
-    ax.set_ylabel("Policy rate (%)")
-    _finalize(fig, ax, "Current Policy Rates — August 2026",
-              "Source: ECB (2026-06-11), Federal Reserve (2026-07-29), Bank of England (2026-07-29). Fed shown at range midpoint (3.50-3.75%).")
-    path = OUT_DIR / "policy_rates.png"
-    fig.savefig(path, dpi=160, bbox_inches="tight")
-    plt.close(fig)
-    return str(path)
-
-
 def chart_h1_investment_by_sector() -> str:
     fig, ax = plt.subplots(figsize=(6, 3.4))
     sectors = ["Living*", "Office", "Industrial &\nLogistics", "Retail", "Hotels"]
@@ -161,7 +143,6 @@ def chart_affordable_housing_gap() -> str:
 
 def build_all_charts() -> dict[str, str]:
     return {
-        "policy_rates": chart_policy_rates(),
         "h1_investment_by_sector": chart_h1_investment_by_sector(),
         "datacenter_vacancy": chart_datacenter_vacancy(),
         "lifesciences_vc": chart_lifesciences_vc(),
