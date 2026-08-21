@@ -2,13 +2,12 @@
 Independent grounding check: does every factual claim in a generated draft actually
 appear in the chunks that were retrieved for it?
 
-Deliberately blunt (regex-based numeric/date extraction + substring/fuzzy match), not a
-full NLI grounding classifier — documented as a limitation in docs/methodology.md.
-Treat the output as a useful flag for a human reviewer, not a certification.
+Deliberately blunt (regex-based numeric/date extraction + substring match), not a full
+NLI grounding classifier. Treat the output as a useful flag for a human reviewer, not a
+certification.
 """
 
 import re
-from difflib import SequenceMatcher
 
 
 NUMBER_PATTERN = re.compile(r"-?\d+\.?\d*%?")
@@ -17,16 +16,17 @@ NUMBER_PATTERN = re.compile(r"-?\d+\.?\d*%?")
 def extract_claims(draft_text: str) -> list[str]:
     """Pull out numeric tokens (rates, percentages, dates, counts) as the checkable
     claims — the cheapest reliable proxy for 'a fact that could be wrong'."""
-    # skip anything inside a NOT CONNECTED placeholder — those are already flagged
     cleaned = re.sub(r"\[DATA SOURCE NOT CONNECTED:.*?\]", "", draft_text)
     # strip our own inline citation parentheticals, e.g. "(Source: ECB, 2026-06-11)" —
-    # these are provenance metadata we inserted, not separate factual claims, and their
-    # hyphenated dates would otherwise be misparsed into spurious fragments like "-06"
+    # these are provenance metadata, not separate factual claims, and their hyphenated
+    # dates would otherwise be misparsed into spurious fragments like "-06"
     cleaned = re.sub(r"\(Source:[^)]*\)", "", cleaned)
+    # also strip trailing "Sources: A; B; C." citation-list lines
+    cleaned = re.sub(r"Sources?:\s*[^\n]*", "", cleaned)
     return sorted(set(NUMBER_PATTERN.findall(cleaned)))
 
 
-def is_grounded(claim: str, chunks: list[dict], min_ratio: float = 0.99) -> tuple[bool, str | None]:
+def is_grounded(claim: str, chunks: list[dict]) -> tuple[bool, str | None]:
     """A numeric claim is 'grounded' if the exact token appears in at least one chunk's
     text. Returns (is_grounded, matching_source_name_or_None)."""
     for chunk in chunks:

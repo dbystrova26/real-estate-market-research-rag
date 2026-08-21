@@ -2,17 +2,16 @@
 Ingests source documents into a common chunk format:
     {"text": str, "source_name": str, "source_url": str, "date": str, "source_type": str}
 
-Every chunk MUST carry a source_name + source_url. This is what makes fact_check.py
-possible downstream — a chunk with no traceable source should never be created.
+Every chunk MUST carry a source_name + source_url — this is what makes fact_check.py
+possible downstream.
 
 Three ingestion paths:
-  - ingest_pdf(path, source_name)         : local PDF (e.g. a baseline house view)
-  - ingest_web(url, source_name)          : any public URL, via Jina Reader (free, no key)
-  - ingest_eurostat(dataset_code, ...)     : Eurostat public REST API
+  - ingest_pdf(path, source_name)      : local PDF (e.g. a baseline house view)
+  - ingest_web(url, source_name)       : any public URL, via Jina Reader (free, no key)
+  - ingest_eurostat(dataset_code, ...) : Eurostat public REST API
 
 Web reading via Jina Reader (https://r.jina.ai/<url>) follows the same free, no-API-key
-pattern documented in https://github.com/dbystrova26/Agent-Reach's web channel — this
-project doesn't install that CLI, but reuses its choice of ingestion tool.
+pattern documented in https://github.com/dbystrova26/Agent-Reach's web channel.
 """
 
 import json
@@ -30,7 +29,7 @@ class Chunk:
     source_name: str
     source_url: str
     date: str
-    source_type: str  # "pdf" | "web" | "api"
+    source_type: str  # "pdf" | "web" | "api" | "verified_fact"
 
 
 def ingest_pdf(path: str, source_name: str, source_url: str = "", published: str = "") -> list[Chunk]:
@@ -61,7 +60,6 @@ def ingest_web(url: str, source_name: str, published: str = "", timeout: int = 2
     resp.raise_for_status()
     text = resp.text
 
-    # split on double newlines, drop very short fragments (nav junk etc.)
     paragraphs = [p.strip() for p in re.split(r"\n\s*\n", text) if len(p.strip()) > 80]
 
     return [
@@ -78,9 +76,8 @@ def ingest_web(url: str, source_name: str, published: str = "", timeout: int = 2
 
 def ingest_eurostat(dataset_code: str, source_name: str, params: dict | None = None,
                      timeout: int = 20) -> list[Chunk]:
-    """Pull a Eurostat dataset via the public statistics API and turn it into one
-    descriptive chunk (Eurostat's raw JSON is not directly prose-readable, so this
-    summarizes it into a citable text block rather than dumping raw numbers)."""
+    """Pull a Eurostat dataset via the public statistics API and summarize into a
+    citable text block (raw JSON is not directly prose-readable)."""
     base = f"https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/{dataset_code}"
     resp = requests.get(base, params=params or {}, timeout=timeout)
     resp.raise_for_status()
@@ -100,10 +97,9 @@ def ingest_eurostat(dataset_code: str, source_name: str, params: dict | None = N
 
 
 def load_verified_facts(path: str) -> list[Chunk]:
-    """Load the pre-gathered, cited fact set in data/verified_facts_*.json as chunks —
-    used so the pipeline has real grounded content to demo against without needing
-    live internet access at run time. See that file's _note field."""
-    data = json.loads(Path(path).read_text())
+    """Load the pre-gathered, cited fact set as chunks — used so the pipeline has real
+    grounded content to demo against without needing live internet access."""
+    data = json.loads(Path(path).read_text(encoding="utf-8"))
     chunks = []
     for fact in data["facts"]:
         chunks.append(Chunk(
@@ -117,7 +113,7 @@ def load_verified_facts(path: str) -> list[Chunk]:
 
 
 def save_chunks(chunks: list[Chunk], out_path: str):
-    Path(out_path).write_text(json.dumps([asdict(c) for c in chunks], indent=2))
+    Path(out_path).write_text(json.dumps([asdict(c) for c in chunks], indent=2), encoding="utf-8")
 
 
 if __name__ == "__main__":

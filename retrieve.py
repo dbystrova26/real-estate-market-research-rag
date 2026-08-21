@@ -1,9 +1,6 @@
 """
 Local, offline embedding + retrieval — no paid embeddings API required.
-
 Uses sentence-transformers/all-MiniLM-L6-v2: small, fast, free, runs on CPU.
-Traded off deliberately against a larger/paid embedding model — see
-docs/methodology.md "Known limitations" for the reasoning.
 """
 
 import json
@@ -21,7 +18,6 @@ class LocalVectorStore:
         self.embeddings: np.ndarray | None = None
 
     def add_chunks(self, chunks: list):
-        """chunks: list of ingest.Chunk (or dicts with the same fields)"""
         as_dicts = [asdict(c) if not isinstance(c, dict) else c for c in chunks]
         texts = [c["text"] for c in as_dicts]
         new_embeddings = self.model.encode(texts, normalize_embeddings=True, show_progress_bar=False)
@@ -36,7 +32,7 @@ class LocalVectorStore:
         if self.embeddings is None or len(self.chunks) == 0:
             return []
         query_vec = self.model.encode([query], normalize_embeddings=True)[0]
-        scores = self.embeddings @ query_vec  # cosine sim, since both are normalized
+        scores = self.embeddings @ query_vec
         top_idx = np.argsort(-scores)[:k]
         results = []
         for idx in top_idx:
@@ -49,10 +45,10 @@ class LocalVectorStore:
         Path(path).write_text(json.dumps({
             "chunks": self.chunks,
             "embeddings": self.embeddings.tolist() if self.embeddings is not None else [],
-        }))
+        }), encoding="utf-8")
 
     def load(self, path: str):
-        data = json.loads(Path(path).read_text())
+        data = json.loads(Path(path).read_text(encoding="utf-8"))
         self.chunks = data["chunks"]
         self.embeddings = np.array(data["embeddings"]) if data["embeddings"] else None
 
@@ -66,6 +62,6 @@ if __name__ == "__main__":
     store.add_chunks(load_verified_facts("verified_facts_2026-08.json"))
 
     results = store.retrieve("has the ECB changed interest rates recently", k=3)
-    print("Top matches for 'has the ECB changed interest rates recently':\n")
+    print("Top matches:\n")
     for r in results:
         print(f"  [{r['_similarity']}] {r['source_name']}: {r['text'][:100]}...")

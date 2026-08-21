@@ -1,5 +1,5 @@
 {
-  "_note": "Every fact below was retrieved from a live web search on 2026-08-08 and is cited to a primary source. This file exists so the RAG pipeline has a real, grounded example dataset to demonstrate against without requiring live internet access at run time. Nothing here is invented — see 'source_url' on each fact.",
+  "_note": "Every fact below was retrieved from a live web search and is cited to a primary source. Nothing here is invented — see 'source_url' on each fact.",
   "facts": [
     {
       "id": "ecb_rate_hike_jun2026",
@@ -55,8 +55,64 @@
       "id": "ecb_cutting_cycle_context",
       "statement": "The ECB cut rates eight times from June 2024 to June 2025, then held rates unchanged from June 2025 until the June 2026 hike.",
       "date": "2026-07-30",
-      "source_name": "UK House of Commons Library — Interest rates and monetary policy briefing",
+      "source_name": "UK House of Commons Library",
       "source_url": "https://commonslibrary.parliament.uk/research-briefings/sn02802/"
+    },
+    {
+      "id": "eu_datacenter_investment_forecast",
+      "statement": "The European Data Centre Association forecasts cumulative European data center investment of EUR 176 billion between 2026 and 2031, with future growth increasingly constrained by grid capacity and energy infrastructure rather than availability of capital.",
+      "date": "2026-02-09",
+      "source_name": "European Data Centre Association via Data Center Knowledge",
+      "source_url": "https://www.datacenterknowledge.com/data-center-site-selection/europe-s-data-center-market-enters-a-pivotal-phase-amid-structural-challenges",
+      "category": "new_trend"
+    },
+    {
+      "id": "eu_datacenter_vacancy",
+      "statement": "European data center vacancy fell below 10% for the first time in late 2024 and is forecast by CBRE to reach an all-time low of 6.5% by the close of 2026, driven by AI-related demand outpacing new supply amid grid connection bottlenecks.",
+      "date": "2026-01-01",
+      "source_name": "CBRE — European Data Centres Outlook 2026",
+      "source_url": "https://www.cbre.com/insights/books/european-real-estate-market-outlook-2026/data-centres",
+      "category": "new_trend"
+    },
+    {
+      "id": "eu_datacenter_fundraising_share",
+      "statement": "Data centers accounted for 31% of global real estate funds raised between January and September 2025, making them the second most in-demand asset type; EMEA-focused real estate fundraising grew 50% year-on-year.",
+      "date": "2025-12-09",
+      "source_name": "Colliers Global Investor Outlook 2026 via Urbanitae",
+      "source_url": "https://blog.urbanitae.com/en/2025/12/09/real-estate-investment-trends-for-2026/",
+      "category": "new_trend"
+    },
+    {
+      "id": "eu_h1_2026_investment_volume",
+      "statement": "European real estate investment reached EUR 116 billion in H1 2026, a 10% year-on-year increase, according to CBRE. The UK led with EUR 26.5 billion, followed by Germany (EUR 16.2 billion) and Spain (EUR 12 billion, up 59% YoY). Living accounted for 26% of H1 investment (up 17% YoY); offices attracted EUR 22.6 billion (up 13% YoY); industrial and logistics received EUR 19.2 billion; retail and hotels recorded EUR 18.1 billion and EUR 11.8 billion respectively.",
+      "date": "2026-07-30",
+      "source_name": "CBRE — European Real Estate Investment Figures, H1 2026",
+      "source_url": "https://www.cbre.co.uk/press-releases/european-real-estate-investment-volumes-rise-as-momentum-swings-in-offices-favour",
+      "category": "trend_update"
+    },
+    {
+      "id": "eu_lifesciences_vc_funding",
+      "statement": "VC investment into European life sciences rebounded strongly in 2025, with total healthcare and life sciences VC volumes reaching EUR 13.2 billion, up 2.8% on 2024. European deep tech and life sciences spinouts are collectively valued at approximately USD 398 billion, having created more than 167,000 jobs across over 7,300 companies.",
+      "date": "2026-02-24",
+      "source_name": "CBRE — European Life Sciences Ecosystems Sector Guide 2026",
+      "source_url": "https://www.cbre.com/insights/reports/european-life-sciences-sector-guide-2026",
+      "category": "new_trend"
+    },
+    {
+      "id": "eu_defense_rearmament_target",
+      "statement": "NATO members have committed to raise core defense spending to 3.5% of GDP by 2035, up from a prior target of 2%, with an additional 1.5% earmarked for broader security-related investment. Germany alone has committed EUR 500 billion to infrastructure and a further EUR 500 billion to defense spending over the next decade.",
+      "date": "2026-02-04",
+      "source_name": "Janus Henderson Investors, citing NATO Summit commitments",
+      "source_url": "https://www.janushenderson.com/en-ie/investor/article/european-defense-stocks-the-magnitude-of-europes-rearmament-remains-underappreciated/",
+      "category": "new_trend"
+    },
+    {
+      "id": "eu_defense_industrial_realestate",
+      "statement": "The EU's ReArm Europe Plan (Readiness 2030) aims to unlock EUR 800 billion in defense investment, with the European Commission raising up to EUR 150 billion on capital markets through the SAFE instrument. Defense spending is concentrating demand in urban technology and research clusters, with Munich and the Rhine-Ruhr Valley identified as primary beneficiaries in Germany, generating residential, office, and industrial/logistics real estate demand.",
+      "date": "2026-08-01",
+      "source_name": "Markets Group — 2026 European Real Estate Allocator Outlook",
+      "source_url": "https://www.marketsgroup.org/strategic-insights/2026-european-real-estate-allocator-outlook",
+      "category": "new_trend"
     }
   ]
 }

@@ -1,0 +1,28 @@
+{
+  "_note": "This is a REAL output — the searches described here were actually run and the sources actually retrieved and cited. Captured as a cache so build_trend_report.py / run_autonomous_report.py --dry-run has something genuine to render without requiring live search access for a first run.",
+  "new_trends": [
+    {
+      "is_new_trend": true,
+      "query": "European data center real estate investment 2026",
+      "trend_summary": "Data centers have emerged as a major institutional European real estate asset class, driven by AI demand: EUR 176bn in cumulative investment is forecast between 2026 and 2031, vacancy is falling toward a record 6.5% by the close of 2026, and the sector captured 31% of global real estate fundraising in the nine months to September 2025.",
+      "citations": [
+        "European Data Centre Association via Data Center Knowledge, 2026-02-09",
+        "CBRE — European Data Centres Outlook 2026, 2026-01-01",
+        "Colliers Global Investor Outlook 2026 via Urbanitae, 2025-12-09"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "known_theme_checks": [
+    {
+      "theme_id": "investment_liquidity_improving",
+      "verdict": "UPDATED",
+      "explanation": "European real estate investment reached EUR 116 billion in H1 2026, up 10% year-on-year, per CBRE (Source: CBRE — European Real Estate Investment Figures H1 2026, 2026-07-30). Capital flows have broadened beyond hotels/offices in London/Paris: living accounted for 26% of H1 investment, and Spain saw investment up 59% YoY."
+    },
+    {
+      "theme_id": "rates_easing_thesis",
+      "verdict": "CONTRADICTED",
+      "explanation": "The ECB reversed into a hiking cycle in June 2026 (Source: European Central Bank, 2026-06-11), directly contradicting the original easing thesis."
+    }
+  ]
+}

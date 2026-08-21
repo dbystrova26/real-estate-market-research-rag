@@ -1,13 +1,12 @@
 """
-Generates the charts used in the report. Every number plotted is either:
-  (a) directly copied from a cited fact in verified_facts_2026-08.json, or
-  (b) a simple, clearly-labeled arithmetic derivation from one (e.g. converting a cited
-      percentage-of-total into a euro figure using the cited total) — never an invented
-      or estimated figure.
+Generates the charts used in the report. Every number plotted is either directly
+copied from a cited fact, or a simple, clearly-labeled arithmetic derivation from one
+— never invented.
 
-Each chart function's docstring states exactly which fact(s) it's drawn from.
-Output: PNG files in charts/, referenced by both render_report.py (HTML) and
-render_pdf.py (PDF).
+Uses fig.text() + explicit subplots_adjust() margins instead of tight_layout() +
+ax.text(transform=ax.transAxes) — the latter combination has a bug where a long
+caption confuses tight_layout's width calculation and compresses the axes, causing
+category labels to overlap.
 """
 
 from pathlib import Path
@@ -35,16 +34,6 @@ plt.rcParams.update({
 
 
 def _finalize(fig, ax, title, source_note):
-    """Replaces the old tight_layout()+ax.text(transform=ax.transAxes) pattern, which
-    had a real bug: a long caption anchored via axes-fraction coordinates confuses
-    tight_layout's width calculation, compressing the axes horizontally while tick
-    label font size stays fixed — causing category labels to overlap. Fixed by:
-      1. Wrapping the caption to a fixed character width, so it's never wider than
-         the figure regardless of how long the source note is.
-      2. Placing it with fig.text() (figure-fraction coords, independent of the
-         axes' own layout) instead of ax.text(transform=ax.transAxes).
-      3. Using explicit fig.subplots_adjust() margins instead of tight_layout(), so
-         the layout is deterministic and doesn't fight with the caption placement."""
     import textwrap
     ax.set_title(title, fontsize=11, fontweight="bold", loc="left", pad=10)
     ax.spines[["top", "right"]].set_visible(False)
@@ -58,11 +47,6 @@ def _finalize(fig, ax, title, source_note):
 
 
 def chart_policy_rates() -> str:
-    """Current central bank policy rates, Aug 2026.
-    Source: ECB deposit facility 2.25% (ECB Monetary policy decision, 2026-06-11);
-    Fed federal funds range 3.50-3.75%, plotted at the 3.625% midpoint (Federal Reserve
-    Board Implementation Note, 2026-07-29); BOE Bank Rate 3.75% (Bank of England MPC
-    Summary, 2026-07-29)."""
     fig, ax = plt.subplots(figsize=(5.5, 3.2))
     banks = ["ECB\n(deposit facility)", "Federal Reserve\n(range midpoint)", "Bank of England\n(Bank Rate)"]
     rates = [2.25, 3.625, 3.75]
@@ -81,11 +65,6 @@ def chart_policy_rates() -> str:
 
 
 def chart_h1_investment_by_sector() -> str:
-    """H1 2026 European real estate investment by sector.
-    Directly cited: Office EUR 22.6bn, Industrial & Logistics EUR 19.2bn, Retail EUR
-    18.1bn, Hotels EUR 11.8bn (all CBRE, 2026-07-30). Living is derived: CBRE cites
-    living as 26% of the EUR 116bn H1 total, so 0.26 x 116 = EUR 30.2bn — a direct
-    arithmetic derivation from two cited figures, labeled as such on the chart."""
     fig, ax = plt.subplots(figsize=(6, 3.4))
     sectors = ["Living*", "Office", "Industrial &\nLogistics", "Retail", "Hotels"]
     values = [30.2, 22.6, 19.2, 18.1, 11.8]
@@ -106,11 +85,6 @@ def chart_h1_investment_by_sector() -> str:
 
 
 def chart_datacenter_vacancy() -> str:
-    """European data center vacancy trend.
-    Source: CBRE — vacancy 'fell below 10% for the first time in late 2024' (plotted at
-    9.9%, the highest value consistent with 'below 10%') and is 'forecast to reach an
-    all-time low of 6.5% by the close of 2026' (CBRE European Data Centres Outlook 2026,
-    2026-01-01)."""
     fig, ax = plt.subplots(figsize=(5.5, 3.2))
     periods = ["Late 2024", "End 2026 (forecast)"]
     values = [9.9, 6.5]
@@ -130,10 +104,6 @@ def chart_datacenter_vacancy() -> str:
 
 
 def chart_lifesciences_vc() -> str:
-    """European life sciences VC funding, 2024 vs 2025.
-    2025 figure (EUR 13.2bn) is directly cited; 2024 figure is derived from the cited
-    year-on-year change ('up 2.8% on 2024'): 13.2 / 1.028 = EUR 12.84bn. (CBRE European
-    Life Sciences Ecosystems Sector Guide 2026, 2026-02-24)."""
     fig, ax = plt.subplots(figsize=(5, 3.2))
     years = ["2024*", "2025"]
     values = [12.84, 13.2]
@@ -153,8 +123,6 @@ def chart_lifesciences_vc() -> str:
 
 
 def chart_defense_spending_target() -> str:
-    """NATO core defense spending target as % of GDP: prior target 2%, new target 3.5%
-    by 2035 (Janus Henderson Investors, citing NATO Summit commitments, 2026-02-04)."""
     fig, ax = plt.subplots(figsize=(5, 3.2))
     labels = ["Prior NATO target", "New target (by 2035)"]
     values = [2.0, 3.5]
@@ -174,9 +142,6 @@ def chart_defense_spending_target() -> str:
 
 
 def chart_affordable_housing_gap() -> str:
-    """EU annual housing construction: current build rate (1.6 million units/year) vs.
-    the additional shortfall the European Commission says is needed (650,000/year) to
-    close the supply-demand gap (European Commission SWD 2025-1053-2, 2025-12-16)."""
     fig, ax = plt.subplots(figsize=(5.5, 3.2))
     labels = ["Current annual\nbuild rate", "Additional units\nneeded per year"]
     values = [1.6, 0.65]

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <title>Rates &amp; Liquidity Update</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --ink: #1a2332;
@@ -31,32 +31,20 @@
     color: var(--accent); font-weight: 600; margin-bottom: 8px;
   }
   h1 {
-    font-family: 'Source Serif 4', Georgia, serif; font-weight: 700;
-    font-size: 38px; line-height: 1.12; margin: 0 0 6px;
+    font-family: 'Inter', sans-serif; font-weight: 700;
+    font-size: 26px; line-height: 1.25; margin: 0 0 6px;
   }
-  .subtitle { font-family: 'Source Serif 4', Georgia, serif; font-size: 20px; color: var(--muted); margin: 0; }
+  .subtitle { font-family: 'Inter', sans-serif; font-weight: 400; font-size: 15px; color: var(--muted); margin: 0; }
   .meta { font-size: 13px; color: var(--muted); margin-top: 14px; }
   h2 {
-    font-family: 'Source Serif 4', Georgia, serif; font-weight: 600; font-size: 24px;
+    font-family: 'Inter', sans-serif; font-weight: 700; font-size: 19px;
     border-left: 4px solid var(--accent); padding-left: 14px; margin: 40px 0 16px;
   }
-  p { margin: 0 0 16px; }
+  p { margin: 0 0 16px; text-align: justify; }
   .placeholder {
     background: var(--tint); border: 1px dashed var(--hairline); border-radius: 4px;
     padding: 10px 14px; font-size: 14px; color: var(--muted); font-style: italic;
   }
-  .citation { color: var(--muted); font-size: 14px; }
-  .pullquote {
-    font-family: 'Source Serif 4', Georgia, serif; font-size: 19px; font-style: italic;
-    color: var(--ink); border-left: 3px solid var(--accent); padding: 4px 0 4px 18px;
-    margin: 28px 0;
-  }
-  .grounding-badge {
-    display: inline-block; padding: 4px 10px; border-radius: 3px; font-size: 12px;
-    font-weight: 600; letter-spacing: 0.03em;
-  }
-  .grounding-badge.pass { background: #e5f3ec; color: #1e6b46; }
-  .grounding-badge.review { background: #fbe9e2; color: var(--accent); }
   .sources { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--hairline); }
   .sources h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
   .sources ol { font-size: 13px; color: var(--muted); padding-left: 20px; }
@@ -68,37 +56,28 @@
 </head>
 <body>
   <div class="masthead">
-    <div class="kicker">Independent research prototype · August 2026 · Not an official Catella publication</div>
+    <div class="kicker">Independent research prototype</div>
     <h1>Rates &amp; Liquidity Update</h1>
-    <p class="subtitle">A RAG-grounded update to the Catella House View, March 2026</p>
-    <div class="meta">Generated 2026-08-08 · Claude-drafted, RAG-grounded</div>
+    <p class="subtitle">A RAG-grounded update — August 2026</p>
+    <div class="meta">Generated 2026-08-21 · Claude-drafted, RAG-grounded</div>
   </div>
 
-  <div class="pullquote">Grounding check: 17/17 numeric claims across this report traced to a cited source (100% coverage). See docs/methodology.md for how this check works and its limitations.</div>
-
-  <h2>What&#x27;s Changed Since March 2026</h2>
-<span class="grounding-badge pass">PASS — all numeric claims traced to a source</span>
-<p>The report&#x27;s financing-cost thesis rested on continued central bank easing. The ECB cut rates eight times from June 2024 to June 2025, then held rates unchanged from June 2025 until reversing course a year later (Source: UK House of Commons Library, 2026-07-30).</p>
+  <h2>Rates &amp; Liquidity Outlook</h2>
+<p>The ECB cut rates eight times from June 2024 to June 2025, then held rates unchanged from June 2025 until reversing course a year later (Source: UK House of Commons Library, 2026-07-30).</p>
 <p>On 17 June 2026, the ECB raised its deposit facility rate by 25 basis points to 2.25% (from 2.00%) — its first hike in three years — in response to an energy price shock tied to the Middle East conflict, which pushed the ECB&#x27;s 2026 inflation projection to 2.6% (Source: European Central Bank — Monetary policy decision, 2026-06-11). At its next meeting, the ECB held rates steady, with the deposit facility, main refinancing, and marginal lending rates unchanged at 2.25%, 2.40%, and 2.65% respectively (Source: European Central Bank — Economic Bulletin Issue 5, 2026, 2026-07-23).</p>
-<p>The Federal Reserve and Bank of England, whose gradual rate cuts the March report also cited as supporting improving financing conditions, have both paused rather than continued cutting. The Fed held its target range at 3.50%-3.75% on 29 July 2026, with three FOMC members dissenting in favor of a hike, under new Fed Chair Kevin Warsh (Source: Federal Reserve Board — Implementation Note, 2026-07-29). The Bank of England&#x27;s Monetary Policy Committee voted 6-3 to hold Bank Rate at 3.75% at its meeting ending 29 July 2026, with the three dissenters voting for a hike to 4% (Source: Bank of England — Monetary Policy Summary and Minutes, July 2026, 2026-07-29).</p>
-<h2>Implication for the Report&#x27;s Financing Thesis</h2>
-<span class="grounding-badge pass">PASS — all numeric claims traced to a source</span>
-<p>The March report&#x27;s central framing — that financing costs would keep falling and debt would become &#x27;increasingly accretive to property returns&#x27; as central banks continued cutting — no longer holds for the Eurozone specifically: the ECB has reversed into a hiking stance, and the Fed and Bank of England have paused rather than delivered the further cuts the report&#x27;s framing implied.</p>
-<div class="placeholder">⚠ Data source not connected: an updated spread between prime office yields and the EURIBOR curve would be needed to quantify how much of the report&#x27;s &#x27;accretive debt&#x27; argument has actually eroded — this requires PMA/Bloomberg yield-spread data, which is not connected in this prototype.</div>
-<div class="placeholder">⚠ Data source not connected: an updated EUR billion figure for European direct real estate transaction volume in H1 2026 would show whether deal activity slowed in response to the June hike — this requires MSCI RCA transaction data, which is not connected in this prototype.</div>
-<p>What can be said on public information alone: the rate environment this report should be read against today is one of paused-to-tightening policy, not the continued easing its financing narrative assumed as recently as March.</p>
+<p>The Federal Reserve and Bank of England have both paused rather than continued cutting. The Fed held its target range at 3.50%-3.75% on 29 July 2026, with three FOMC members dissenting in favor of a hike, under new Fed Chair Kevin Warsh (Source: Federal Reserve Board — Implementation Note, 2026-07-29). The Bank of England&#x27;s Monetary Policy Committee voted 6-3 to hold Bank Rate at 3.75% at its meeting ending 29 July 2026, with the three dissenters voting for a hike to 4% (Source: Bank of England — Monetary Policy Summary and Minutes, July 2026, 2026-07-29).</p>
 
   <div class="sources">
     <h3>Sources cited</h3>
-    <ol><li>Bank of England â€” Monetary Policy Summary and Minutes, July 2026 — <a href="https://www.bankofengland.co.uk/monetary-policy-summary-and-minutes/2026/july-2026">https://www.bankofengland.co.uk/monetary-policy-summary-and-minutes/2026/july-2026</a></li>
-<li>European Central Bank â€” Economic Bulletin Issue 5, 2026 — <a href="https://www.ecb.europa.eu/press/economic-bulletin/html/eb202605.en.html">https://www.ecb.europa.eu/press/economic-bulletin/html/eb202605.en.html</a></li>
-<li>European Central Bank â€” Monetary policy decision — <a href="https://www.ecb.europa.eu/press/pr/date/2026/html/ecb.mp260611~4d41bd5e83.en.html">https://www.ecb.europa.eu/press/pr/date/2026/html/ecb.mp260611~4d41bd5e83.en.html</a></li>
-<li>Federal Reserve Board â€” Implementation Note — <a href="https://www.federalreserve.gov/newsevents/pressreleases/monetary20260729a1.htm">https://www.federalreserve.gov/newsevents/pressreleases/monetary20260729a1.htm</a></li>
-<li>UK House of Commons Library â€” Interest rates and monetary policy briefing — <a href="https://commonslibrary.parliament.uk/research-briefings/sn02802/">https://commonslibrary.parliament.uk/research-briefings/sn02802/</a></li></ol>
+    <ol><li>Bank of England — Monetary Policy Summary and Minutes, July 2026 — <a href="https://www.bankofengland.co.uk/monetary-policy-summary-and-minutes/2026/july-2026">https://www.bankofengland.co.uk/monetary-policy-summary-and-minutes/2026/july-2026</a></li>
+<li>European Central Bank — Economic Bulletin Issue 5, 2026 — <a href="https://www.ecb.europa.eu/press/economic-bulletin/html/eb202605.en.html">https://www.ecb.europa.eu/press/economic-bulletin/html/eb202605.en.html</a></li>
+<li>European Central Bank — Monetary policy decision — <a href="https://www.ecb.europa.eu/press/pr/date/2026/html/ecb.mp260611~4d41bd5e83.en.html">https://www.ecb.europa.eu/press/pr/date/2026/html/ecb.mp260611~4d41bd5e83.en.html</a></li>
+<li>Federal Reserve Board — Implementation Note — <a href="https://www.federalreserve.gov/newsevents/pressreleases/monetary20260729a1.htm">https://www.federalreserve.gov/newsevents/pressreleases/monetary20260729a1.htm</a></li>
+<li>UK House of Commons Library — <a href="https://commonslibrary.parliament.uk/research-briefings/sn02802/">https://commonslibrary.parliament.uk/research-briefings/sn02802/</a></li></ol>
   </div>
 
   <div class="disclaimer">
-    This is an independent portfolio prototype demonstrating a RAG-grounded report-drafting pipeline. It is not an official Catella publication, is not affiliated with or endorsed by Catella AB, and does not reproduce any text, data, or branding from Catella&#x27;s copyrighted March 2026 House View. All facts above are drawn from public central bank sources — see the source list below and data/verified_facts_2026-08.json for full citations.
+    This is an independent portfolio prototype. Not an official publication of, and not affiliated with or endorsed by, any organization referenced.
   </div>
 </body>
 </html>

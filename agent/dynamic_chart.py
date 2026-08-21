@@ -1,8 +1,8 @@
 """
 Builds a chart from an arbitrary set of {label, value, unit, derived, note} data
-points — used by the autonomous pipeline, where topics (and therefore what's
-chartable) aren't known in advance the way they are in charts/build_charts.py's
-hand-picked charts.
+points — used by the autonomous pipeline, where topics aren't known in advance.
+Uses fig.text() + explicit margins instead of tight_layout() — see
+charts/build_charts.py for why.
 """
 
 from pathlib import Path
@@ -28,10 +28,6 @@ plt.rcParams.update({
 
 
 def build_dynamic_chart(chart_data: dict, out_path: str) -> str:
-    """chart_data: {"chart_title": str, "data_points": [{"label", "value", "unit",
-    "derived", "note"}]}. Any point with derived=True gets a distinct color and an
-    asterisk, and its note is folded into the source caption — same convention as
-    the hand-built charts, so a reader can't miss which numbers were derived."""
     import textwrap
 
     points = chart_data["data_points"]
@@ -49,11 +45,6 @@ def build_dynamic_chart(chart_data: dict, out_path: str) -> str:
     ax.spines[["top", "right"]].set_visible(False)
     ax.set_title(chart_data["chart_title"], fontsize=11, fontweight="bold", loc="left", pad=10)
 
-    # NOTE: captions are placed via fig.text() (figure-fraction coords) with explicit
-    # subplots_adjust margins, NOT tight_layout()+ax.text(transform=ax.transAxes) —
-    # that combination has a real bug where a long caption confuses tight_layout's
-    # width calculation and compresses the axes, causing category labels to overlap.
-    # See charts/build_charts.py's _finalize() for the same fix applied there.
     notes = "; ".join(p["note"] for p in points if p.get("note"))
     caption = notes[:220] + ("…" if len(notes) > 220 else "")
     if any(p.get("derived") for p in points):

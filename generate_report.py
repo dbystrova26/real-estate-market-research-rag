@@ -1,12 +1,8 @@
 """
 Generates a report section grounded strictly in retrieved chunks — Claude is the model
-used (this is the "Use Claude first" phase; see docs/use_case_definition.md for the
-phase-2 multi-model plan).
-
-The system prompt enforces three hard rules (see docs/methodology.md "Generation"):
-  1. Every factual claim must cite a retrieved chunk inline.
-  2. Missing data -> write a visible placeholder, never estimate.
-  3. Contradictions between sources are surfaced, not silently resolved.
+used. The system prompt enforces: (1) every claim cites a retrieved chunk inline,
+(2) missing data gets a visible placeholder, never a guess, (3) contradictions are
+surfaced, not silently resolved.
 """
 
 import os

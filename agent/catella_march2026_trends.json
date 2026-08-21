@@ -1,0 +1,40 @@
+{
+  "_note": "Short, paraphrased summaries of a house view's core themes — used as the baseline the trend agent checks new search results against.",
+  "themes": [
+    {
+      "id": "rates_easing_thesis",
+      "summary": "Central banks were expected to keep cutting rates through 2026, making debt increasingly accretive to property returns.",
+      "search_query": "ECB Federal Reserve Bank of England interest rate decision 2026"
+    },
+    {
+      "id": "price_discovery_complete",
+      "summary": "European property price discovery was seen as largely complete after a pan-regional decline since 2021, with a new pricing cycle beginning.",
+      "search_query": "European commercial real estate price recovery cycle 2026"
+    },
+    {
+      "id": "investment_liquidity_improving",
+      "summary": "European direct real estate investment volume was recovering, with liquidity improving unevenly and capital favoring hotels and offices in gateway cities.",
+      "search_query": "European real estate investment volume liquidity 2026"
+    },
+    {
+      "id": "affordable_housing_priority",
+      "summary": "Affordable housing was framed as a non-negotiable structural investment priority given a multi-million-unit European shortfall.",
+      "search_query": "European affordable housing shortfall investment 2026"
+    },
+    {
+      "id": "operational_living_growth",
+      "summary": "Operational living (senior housing, co-living, student housing, serviced apartments) was framed as a build-to-scale structural opportunity.",
+      "search_query": "European senior housing co-living operational living investment 2026"
+    },
+    {
+      "id": "retail_logistics_tactical",
+      "summary": "Retail was recovering after a decade of decline; logistics had normalized post-COVID with rental growth at a multi-year low.",
+      "search_query": "European retail logistics real estate investment 2026"
+    },
+    {
+      "id": "office_flight_to_quality",
+      "summary": "Office demand was concentrated in prime, sustainability-certified central-business-district assets, with overall take-up constrained.",
+      "search_query": "European office market flight to quality prime 2026"
+    }
+  ]
+}
