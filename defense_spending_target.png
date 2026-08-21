@@ -1,0 +1,211 @@
+"""
+Generates the charts used in the report. Every number plotted is either:
+  (a) directly copied from a cited fact in verified_facts_2026-08.json, or
+  (b) a simple, clearly-labeled arithmetic derivation from one (e.g. converting a cited
+      percentage-of-total into a euro figure using the cited total) — never an invented
+      or estimated figure.
+
+Each chart function's docstring states exactly which fact(s) it's drawn from.
+Output: PNG files in charts/, referenced by both render_report.py (HTML) and
+render_pdf.py (PDF).
+"""
+
+from pathlib import Path
+
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+
+OUT_DIR = Path(__file__).resolve().parent
+INK = "#1a2332"
+ACCENT = "#8c1d2b"
+MUTED = "#5b6472"
+BARCOLOR = "#3d5a73"
+
+plt.rcParams.update({
+    "font.family": "sans-serif",
+    "font.sans-serif": ["Helvetica", "Arial", "Inter", "DejaVu Sans"],
+    "axes.edgecolor": "#d8dce1",
+    "axes.labelcolor": INK,
+    "text.color": INK,
+    "xtick.color": MUTED,
+    "ytick.color": MUTED,
+    "axes.titlecolor": INK,
+})
+
+
+def _finalize(fig, ax, title, source_note):
+    """Replaces the old tight_layout()+ax.text(transform=ax.transAxes) pattern, which
+    had a real bug: a long caption anchored via axes-fraction coordinates confuses
+    tight_layout's width calculation, compressing the axes horizontally while tick
+    label font size stays fixed — causing category labels to overlap. Fixed by:
+      1. Wrapping the caption to a fixed character width, so it's never wider than
+         the figure regardless of how long the source note is.
+      2. Placing it with fig.text() (figure-fraction coords, independent of the
+         axes' own layout) instead of ax.text(transform=ax.transAxes).
+      3. Using explicit fig.subplots_adjust() margins instead of tight_layout(), so
+         the layout is deterministic and doesn't fight with the caption placement."""
+    import textwrap
+    ax.set_title(title, fontsize=11, fontweight="bold", loc="left", pad=10)
+    ax.spines[["top", "right"]].set_visible(False)
+
+    wrapped = textwrap.fill(source_note, width=95)
+    n_lines = wrapped.count("\n") + 1
+    bottom_margin = 0.14 + 0.045 * n_lines
+
+    fig.subplots_adjust(left=0.13, right=0.95, top=0.86, bottom=bottom_margin)
+    fig.text(0.02, 0.02, wrapped, fontsize=7, color=MUTED, ha="left", va="bottom")
+
+
+def chart_policy_rates() -> str:
+    """Current central bank policy rates, Aug 2026.
+    Source: ECB deposit facility 2.25% (ECB Monetary policy decision, 2026-06-11);
+    Fed federal funds range 3.50-3.75%, plotted at the 3.625% midpoint (Federal Reserve
+    Board Implementation Note, 2026-07-29); BOE Bank Rate 3.75% (Bank of England MPC
+    Summary, 2026-07-29)."""
+    fig, ax = plt.subplots(figsize=(5.5, 3.2))
+    banks = ["ECB\n(deposit facility)", "Federal Reserve\n(range midpoint)", "Bank of England\n(Bank Rate)"]
+    rates = [2.25, 3.625, 3.75]
+    bars = ax.bar(banks, rates, color=[ACCENT, BARCOLOR, BARCOLOR], width=0.5)
+    for bar, rate in zip(bars, rates):
+        ax.text(bar.get_x() + bar.get_width() / 2, rate + 0.08, f"{rate}%",
+                 ha="center", fontsize=10, fontweight="bold")
+    ax.set_ylim(0, 4.5)
+    ax.set_ylabel("Policy rate (%)")
+    _finalize(fig, ax, "Current Policy Rates — August 2026",
+              "Source: ECB (2026-06-11), Federal Reserve (2026-07-29), Bank of England (2026-07-29). Fed shown at range midpoint (3.50-3.75%).")
+    path = OUT_DIR / "policy_rates.png"
+    fig.savefig(path, dpi=160, bbox_inches="tight")
+    plt.close(fig)
+    return str(path)
+
+
+def chart_h1_investment_by_sector() -> str:
+    """H1 2026 European real estate investment by sector.
+    Directly cited: Office EUR 22.6bn, Industrial & Logistics EUR 19.2bn, Retail EUR
+    18.1bn, Hotels EUR 11.8bn (all CBRE, 2026-07-30). Living is derived: CBRE cites
+    living as 26% of the EUR 116bn H1 total, so 0.26 x 116 = EUR 30.2bn — a direct
+    arithmetic derivation from two cited figures, labeled as such on the chart."""
+    fig, ax = plt.subplots(figsize=(6, 3.4))
+    sectors = ["Living*", "Office", "Industrial &\nLogistics", "Retail", "Hotels"]
+    values = [30.2, 22.6, 19.2, 18.1, 11.8]
+    colors = [ACCENT if s == "Living*" else BARCOLOR for s in sectors]
+    bars = ax.barh(sectors, values, color=colors)
+    for bar, val in zip(bars, values):
+        ax.text(val + 0.5, bar.get_y() + bar.get_height() / 2, f"€{val}bn",
+                 va="center", fontsize=9, fontweight="bold")
+    ax.set_xlabel("EUR billion")
+    ax.invert_yaxis()
+    _finalize(fig, ax, "European Real Estate Investment by Sector, H1 2026",
+              "Source: CBRE, European Real Estate Investment Figures H1 2026 (2026-07-30). "
+              "*Living derived as 26% of the cited EUR 116bn H1 total.")
+    path = OUT_DIR / "h1_investment_by_sector.png"
+    fig.savefig(path, dpi=160, bbox_inches="tight")
+    plt.close(fig)
+    return str(path)
+
+
+def chart_datacenter_vacancy() -> str:
+    """European data center vacancy trend.
+    Source: CBRE — vacancy 'fell below 10% for the first time in late 2024' (plotted at
+    9.9%, the highest value consistent with 'below 10%') and is 'forecast to reach an
+    all-time low of 6.5% by the close of 2026' (CBRE European Data Centres Outlook 2026,
+    2026-01-01)."""
+    fig, ax = plt.subplots(figsize=(5.5, 3.2))
+    periods = ["Late 2024", "End 2026 (forecast)"]
+    values = [9.9, 6.5]
+    bars = ax.bar(periods, values, color=[BARCOLOR, ACCENT], width=0.4)
+    for bar, val, label in zip(bars, values, ["<10%", "6.5%"]):
+        ax.text(bar.get_x() + bar.get_width() / 2, val + 0.2, label,
+                 ha="center", fontsize=10, fontweight="bold")
+    ax.set_ylim(0, 12)
+    ax.set_ylabel("Vacancy rate (%)")
+    _finalize(fig, ax, "European Data Center Vacancy",
+              "Source: CBRE, European Data Centres Outlook 2026 (2026-01-01). Late-2024 bar "
+              "shows the cited upper bound ('below 10%'), not an exact reported figure.")
+    path = OUT_DIR / "datacenter_vacancy.png"
+    fig.savefig(path, dpi=160, bbox_inches="tight")
+    plt.close(fig)
+    return str(path)
+
+
+def chart_lifesciences_vc() -> str:
+    """European life sciences VC funding, 2024 vs 2025.
+    2025 figure (EUR 13.2bn) is directly cited; 2024 figure is derived from the cited
+    year-on-year change ('up 2.8% on 2024'): 13.2 / 1.028 = EUR 12.84bn. (CBRE European
+    Life Sciences Ecosystems Sector Guide 2026, 2026-02-24)."""
+    fig, ax = plt.subplots(figsize=(5, 3.2))
+    years = ["2024*", "2025"]
+    values = [12.84, 13.2]
+    bars = ax.bar(years, values, color=[BARCOLOR, ACCENT], width=0.4)
+    for bar, val in zip(bars, values):
+        ax.text(bar.get_x() + bar.get_width() / 2, val + 0.1, f"€{val}bn",
+                 ha="center", fontsize=10, fontweight="bold")
+    ax.set_ylim(0, 15)
+    ax.set_ylabel("VC funding (EUR billion)")
+    _finalize(fig, ax, "European Life Sciences VC Funding",
+              "Source: CBRE, European Life Sciences Ecosystems Sector Guide 2026 (2026-02-24). "
+              "*2024 derived from the cited 2.8% YoY increase to 2025.")
+    path = OUT_DIR / "lifesciences_vc.png"
+    fig.savefig(path, dpi=160, bbox_inches="tight")
+    plt.close(fig)
+    return str(path)
+
+
+def chart_defense_spending_target() -> str:
+    """NATO core defense spending target as % of GDP: prior target 2%, new target 3.5%
+    by 2035 (Janus Henderson Investors, citing NATO Summit commitments, 2026-02-04)."""
+    fig, ax = plt.subplots(figsize=(5, 3.2))
+    labels = ["Prior NATO target", "New target (by 2035)"]
+    values = [2.0, 3.5]
+    bars = ax.bar(labels, values, color=[BARCOLOR, ACCENT], width=0.4)
+    for bar, val in zip(bars, values):
+        ax.text(bar.get_x() + bar.get_width() / 2, val + 0.08, f"{val}%",
+                 ha="center", fontsize=10, fontweight="bold")
+    ax.set_ylim(0, 4.2)
+    ax.set_ylabel("Core defense spending (% of GDP)")
+    _finalize(fig, ax, "NATO Core Defense Spending Target",
+              "Source: Janus Henderson Investors, citing NATO Summit commitments (2026-02-04). "
+              "An additional 1.5% of GDP is earmarked for broader security investment, not shown.")
+    path = OUT_DIR / "defense_spending_target.png"
+    fig.savefig(path, dpi=160, bbox_inches="tight")
+    plt.close(fig)
+    return str(path)
+
+
+def chart_affordable_housing_gap() -> str:
+    """EU annual housing construction: current build rate (1.6 million units/year) vs.
+    the additional shortfall the European Commission says is needed (650,000/year) to
+    close the supply-demand gap (European Commission SWD 2025-1053-2, 2025-12-16)."""
+    fig, ax = plt.subplots(figsize=(5.5, 3.2))
+    labels = ["Current annual\nbuild rate", "Additional units\nneeded per year"]
+    values = [1.6, 0.65]
+    bars = ax.bar(labels, values, color=[BARCOLOR, ACCENT], width=0.4)
+    for bar, val in zip(bars, values):
+        ax.text(bar.get_x() + bar.get_width() / 2, val + 0.04, f"{val}M",
+                 ha="center", fontsize=10, fontweight="bold")
+    ax.set_ylim(0, 2.1)
+    ax.set_ylabel("Dwellings per year (millions)")
+    _finalize(fig, ax, "EU Housing Supply Gap",
+              "Source: European Commission, Affordable Housing Plan SWD 2025-1053-2 (2025-12-16).")
+    path = OUT_DIR / "affordable_housing_gap.png"
+    fig.savefig(path, dpi=160, bbox_inches="tight")
+    plt.close(fig)
+    return str(path)
+
+
+def build_all_charts() -> dict[str, str]:
+    return {
+        "policy_rates": chart_policy_rates(),
+        "h1_investment_by_sector": chart_h1_investment_by_sector(),
+        "datacenter_vacancy": chart_datacenter_vacancy(),
+        "lifesciences_vc": chart_lifesciences_vc(),
+        "defense_spending_target": chart_defense_spending_target(),
+        "affordable_housing_gap": chart_affordable_housing_gap(),
+    }
+
+
+if __name__ == "__main__":
+    paths = build_all_charts()
+    for name, path in paths.items():
+        print(f"{name}: {path}")

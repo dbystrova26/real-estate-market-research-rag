@@ -1,0 +1,70 @@
+"""
+Builds a chart from an arbitrary set of {label, value, unit, derived, note} data
+points — used by the autonomous pipeline, where topics (and therefore what's
+chartable) aren't known in advance the way they are in charts/build_charts.py's
+hand-picked charts.
+"""
+
+from pathlib import Path
+
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+
+INK = "#1a2332"
+ACCENT = "#8c1d2b"
+MUTED = "#5b6472"
+BARCOLOR = "#3d5a73"
+
+plt.rcParams.update({
+    "font.family": "sans-serif",
+    "font.sans-serif": ["Helvetica", "Arial", "Inter", "DejaVu Sans"],
+    "axes.edgecolor": "#d8dce1",
+    "axes.labelcolor": INK,
+    "text.color": INK,
+    "xtick.color": MUTED,
+    "ytick.color": MUTED,
+})
+
+
+def build_dynamic_chart(chart_data: dict, out_path: str) -> str:
+    """chart_data: {"chart_title": str, "data_points": [{"label", "value", "unit",
+    "derived", "note"}]}. Any point with derived=True gets a distinct color and an
+    asterisk, and its note is folded into the source caption — same convention as
+    the hand-built charts, so a reader can't miss which numbers were derived."""
+    import textwrap
+
+    points = chart_data["data_points"]
+    labels = [p["label"] + ("*" if p.get("derived") else "") for p in points]
+    values = [p["value"] for p in points]
+    colors = [ACCENT if p.get("derived") else BARCOLOR for p in points]
+    unit = points[0].get("unit", "")
+
+    fig, ax = plt.subplots(figsize=(5.5, 3.2))
+    bars = ax.bar(labels, values, color=colors, width=0.5)
+    for bar, val in zip(bars, values):
+        ax.text(bar.get_x() + bar.get_width() / 2, val + max(values) * 0.02,
+                 f"{val:g}{unit}", ha="center", fontsize=9, fontweight="bold")
+    ax.set_ylim(0, max(values) * 1.2)
+    ax.spines[["top", "right"]].set_visible(False)
+    ax.set_title(chart_data["chart_title"], fontsize=11, fontweight="bold", loc="left", pad=10)
+
+    # NOTE: captions are placed via fig.text() (figure-fraction coords) with explicit
+    # subplots_adjust margins, NOT tight_layout()+ax.text(transform=ax.transAxes) —
+    # that combination has a real bug where a long caption confuses tight_layout's
+    # width calculation and compresses the axes, causing category labels to overlap.
+    # See charts/build_charts.py's _finalize() for the same fix applied there.
+    notes = "; ".join(p["note"] for p in points if p.get("note"))
+    caption = notes[:220] + ("…" if len(notes) > 220 else "")
+    if any(p.get("derived") for p in points):
+        caption += "  (* derived from a cited figure)"
+    wrapped = textwrap.fill(caption, width=95)
+    n_lines = wrapped.count("\n") + 1
+    bottom_margin = 0.14 + 0.045 * n_lines
+
+    fig.subplots_adjust(left=0.13, right=0.95, top=0.86, bottom=bottom_margin)
+    fig.text(0.02, 0.02, wrapped, fontsize=6.5, color=MUTED, ha="left", va="bottom")
+
+    fig.savefig(out_path, dpi=160, bbox_inches="tight")
+    plt.close(fig)
+    return out_path
